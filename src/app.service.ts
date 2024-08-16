@@ -21,8 +21,8 @@ export class AppService {
     });
 
     const llmInstance = new ChatGroq({
-      model: 'llama3-8b-8192',
-      temperature: 0,
+      model: 'mixtral-8x7b-32768',
+      temperature: 0.5,
       maxTokens: undefined,
       maxRetries: 2,
     });
@@ -44,7 +44,15 @@ export class AppService {
 
       ---
 
-      Answer the question based on the above context: {userPrompt}`,
+      Answer the question based on the above context: {userPrompt}
+      --- 
+
+      - If you don't know the answer, you can say "Its not referenced in game manual, double check the game manual or internet"
+      - Be clear and concise in your response.
+      - only reply to the answer of the question.
+
+      ---
+      `,
     );
   }
 }
