@@ -6,8 +6,14 @@ import { DocumentInterface } from '@langchain/core/documents';
 export class AppService {
   constructor(private readonly appRepo: AppRepository) {}
 
-  async getHello(): Promise<DocumentInterface<Record<string, any>>[]> {
-    const data = await this.appRepo.requestPineconeData('Sport');
+  async getHello(
+    prompt: string,
+  ): Promise<DocumentInterface<Record<string, any>>[]> {
+    const data = await this.appRepo.requestPineconeData(prompt);
     return data;
+  }
+
+  async insertStaticGameManual() {
+    await this.appRepo.insertStaticGameManual();
   }
 }

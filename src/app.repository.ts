@@ -2,8 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { PineconeLoader } from './loader/pinecone.loader';
 import { HuggingFaceTransformersEmbeddings } from '@langchain/community/embeddings/hf_transformers';
 import { PineconeStore } from '@langchain/pinecone';
-import { DocumentInterface } from '@langchain/core/documents';
+import { DocumentInterface, Document } from '@langchain/core/documents';
+import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
+import { DirectoryLoader } from 'langchain/document_loaders/fs/directory';
+import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 
+const PATH_TO_DOCUMENTS = `/src/documents`;
 @Injectable()
 export class AppRepository {
   private readonly hfEmbeddings = new HuggingFaceTransformersEmbeddings({
@@ -12,6 +16,11 @@ export class AppRepository {
 
   constructor(private pinecone: PineconeLoader) {}
 
+  /**
+   * This methode request the Pinecone data based on the user prompt
+   * @param prompt the user prompt
+   * @returns the Pinecone data for the prompt
+   */
   async requestPineconeData(
     prompt: string,
   ): Promise<DocumentInterface<Record<string, any>>[]> {
@@ -23,37 +32,78 @@ export class AppRepository {
       },
     );
 
-    // const document1: Document = {
-    //   pageContent: 'The powerhouse of the cell is the mitochondria',
-    //   metadata: { source: 'https://example.com' },
-    // };
-
-    // const document2: Document = {
-    //   pageContent: 'Buildings are made out of brick',
-    //   metadata: { source: 'https://example.com' },
-    // };
-
-    // const document3: Document = {
-    //   pageContent: 'Mitochondria are made out of lipids',
-    //   metadata: { source: 'https://example.com' },
-    // };
-
-    // const document4: Document = {
-    //   pageContent: 'The 2024 Olympics are in Paris',
-    //   metadata: { source: 'https://example.com' },
-    // };
-
-    // const documents = [document1, document2, document3, document4];
-
-    // await vectorStore.addDocuments(documents, { ids: ['1', '2', '3', '4'] });
-
     const similaritySearchResults = await vectorStore.similaritySearch(
       prompt,
-      2,
+      5,
     );
 
     return similaritySearchResults;
   }
 
-  async insertNewGameDocument() {}
+  /**
+   * This method insert the static game manual into the Pinecone index
+   */
+  async insertStaticGameManual() {
+    const vectorStore = await PineconeStore.fromExistingIndex(
+      this.hfEmbeddings,
+      {
+        pineconeIndex: this.pinecone.pineconeIndex,
+        maxConcurrency: 5,
+      },
+    );
+
+    const directoryLoader = new DirectoryLoader(
+      `${process.cwd() + PATH_TO_DOCUMENTS}`,
+      {
+        '.pdf': (path: string) => new PDFLoader(path),
+      },
+    );
+
+    const directoryDocs = await directoryLoader.load();
+
+    const textSplitter = new RecursiveCharacterTextSplitter({
+      chunkSize: 1024,
+      chunkOverlap: 80,
+    });
+
+    const splitDocs = await textSplitter.splitDocuments(directoryDocs);
+
+    // Remove metadata that is too large for Pinecone
+    splitDocs.forEach((doc) => {
+      delete doc.metadata.pdf;
+      delete doc.metadata.loc;
+    });
+
+    const ids = this.generateDocumentId(splitDocs);
+
+    await vectorStore.addDocuments(splitDocs, {
+      ids: ids,
+    });
+  }
+
+  /**
+   * This methode generate the document id based on the document name and the index
+   * @param documents the document chunks
+   * @returns the document ids according the document and the chunk index
+   */
+  private generateDocumentId(
+    documents: Document<Record<string, any>>[],
+  ): string[] {
+    let previousDocument = '';
+    let index = 0;
+    return documents.map((doc) => {
+      const documentName = doc.metadata.source.split(
+        `${PATH_TO_DOCUMENTS}/`,
+      )[1]; // Document name
+      if (documentName !== previousDocument) {
+        previousDocument = documentName;
+        index = 0;
+      }
+
+      const documentId = `${documentName}-${index}`;
+      index += 1;
+
+      return documentId;
+    });
+  }
 }
