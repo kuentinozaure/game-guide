@@ -7,8 +7,7 @@ export class AppController {
 
   @Get()
   async getHello(@Query() params: { prompt: string }): Promise<string> {
-    const data = await this.appService.getHello(params.prompt);
-    return data.map((doc) => doc.pageContent).join('\n');
+    return await this.appService.getHello(params.prompt);
   }
 
   @Post()
