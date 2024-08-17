@@ -61,8 +61,6 @@ export class AppRepository {
 
     const directoryDocs = await directoryLoader.load();
 
-    console.log('Splitting documents');
-
     const textSplitter = new RecursiveCharacterTextSplitter({
       chunkSize: 100,
       chunkOverlap: 20,
@@ -74,18 +72,16 @@ export class AppRepository {
     splitDocs.forEach((doc) => {
       delete doc.metadata.pdf;
       delete doc.metadata.loc;
+      doc.metadata.source = doc.metadata.source.split(
+        `${PATH_TO_DOCUMENTS}/`,
+      )[1]; // avoid storing the full path
     });
 
     const ids = this.generateDocumentId(splitDocs);
 
-    console.log(ids);
-    console.log('Inserting static game manual');
-
     await vectorStore.addDocuments(splitDocs, {
       ids: ids,
     });
-
-    console.log('Inserted static game manual');
   }
 
   async deleteDocuments() {
@@ -113,9 +109,7 @@ export class AppRepository {
     let previousDocument = '';
     let index = 0;
     return documents.map((doc) => {
-      const documentName = doc.metadata.source.split(
-        `${PATH_TO_DOCUMENTS}/`,
-      )[1]; // Document name
+      const documentName = doc.metadata.source; // Document name
       if (documentName !== previousDocument) {
         previousDocument = documentName;
         index = 0;
