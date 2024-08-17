@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query } from '@nestjs/common';
+import { Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -15,5 +15,12 @@ export class AppController {
     await this.appService.insertStaticGameManual();
 
     return 'Inserted static game manual';
+  }
+
+  @Delete()
+  async deleteDocuments(): Promise<string> {
+    await this.appService.deleteAllDocuments();
+
+    return 'deleted all documents';
   }
 }

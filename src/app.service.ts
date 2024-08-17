@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { AppRepository } from './app.repository';
-import { DocumentInterface } from '@langchain/core/documents';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { ChatGroq } from '@langchain/groq';
 
@@ -34,6 +33,10 @@ export class AppService {
 
   async insertStaticGameManual() {
     await this.appRepo.insertStaticGameManual();
+  }
+
+  async deleteAllDocuments() {
+    await this.appRepo.deleteDocuments();
   }
 
   private createPromptTemplate(): PromptTemplate {

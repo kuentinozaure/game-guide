@@ -34,7 +34,7 @@ export class AppRepository {
 
     const similaritySearchResults = await vectorStore.similaritySearch(
       prompt,
-      5,
+      100,
     );
 
     return similaritySearchResults;
@@ -61,9 +61,11 @@ export class AppRepository {
 
     const directoryDocs = await directoryLoader.load();
 
+    console.log('Splitting documents');
+
     const textSplitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 1024,
-      chunkOverlap: 80,
+      chunkSize: 100,
+      chunkOverlap: 20,
     });
 
     const splitDocs = await textSplitter.splitDocuments(directoryDocs);
@@ -76,8 +78,27 @@ export class AppRepository {
 
     const ids = this.generateDocumentId(splitDocs);
 
+    console.log(ids);
+    console.log('Inserting static game manual');
+
     await vectorStore.addDocuments(splitDocs, {
       ids: ids,
+    });
+
+    console.log('Inserted static game manual');
+  }
+
+  async deleteDocuments() {
+    const vectorStore = await PineconeStore.fromExistingIndex(
+      this.hfEmbeddings,
+      {
+        pineconeIndex: this.pinecone.pineconeIndex,
+        maxConcurrency: 5,
+      },
+    );
+
+    vectorStore.delete({
+      deleteAll: true,
     });
   }
 
