@@ -7,7 +7,7 @@ import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
 import { DirectoryLoader } from 'langchain/document_loaders/fs/directory';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 
-const PATH_TO_DOCUMENTS = `/src/documents`;
+const PATH_TO_DOCUMENTS = `../documents`;
 @Injectable()
 export class GameGuideRepository {
   private readonly hfEmbeddings = new HuggingFaceTransformersEmbeddings({

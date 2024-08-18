@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { GameDto } from 'src/dto/game.dto';
-import { Game } from 'src/schema/game.schema';
+import { GameDto } from '../dto/game.dto';
+import { Game } from '../schema/game.schema';
 
 @Injectable()
 export class GameService {
