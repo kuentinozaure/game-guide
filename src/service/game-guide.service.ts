@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GameGuideRepository } from './game-guide.repository';
+import { GameGuideRepository } from '../repository/game-guide.repository';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { ChatGroq } from '@langchain/groq';
 

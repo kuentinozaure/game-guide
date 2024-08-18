@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PineconeLoader } from './loader/pinecone.loader';
+import { PineconeLoader } from '../loader/pinecone.loader';
 import { HuggingFaceTransformersEmbeddings } from '@langchain/community/embeddings/hf_transformers';
 import { PineconeStore } from '@langchain/pinecone';
 import { DocumentInterface, Document } from '@langchain/core/documents';
