@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { AppRepository } from './app.repository';
+import { GameGuideRepository } from './game-guide.repository';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { ChatGroq } from '@langchain/groq';
 
 @Injectable()
-export class AppService {
-  constructor(private readonly appRepo: AppRepository) {}
+export class GameGuideService {
+  constructor(private readonly appRepo: GameGuideRepository) {}
 
-  async getHello(prompt: string): Promise<string> {
+  async getGameGuideInfo(prompt: string): Promise<string> {
     const data = await this.appRepo.requestPineconeData(prompt);
     const promptTemplate = this.createPromptTemplate();
     const contextText: string = data

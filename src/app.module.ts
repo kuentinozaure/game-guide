@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { GameGuideController } from './game-guide.controller';
+import { GameGuideService } from './game-guide.service';
 import { ConfigModule } from '@nestjs/config';
-import { AppRepository } from './app.repository';
 import { PineconeLoader } from './loader/pinecone.loader';
+import { GameGuideRepository } from './game-guide.repository';
 
 @Module({
   imports: [ConfigModule.forRoot()],
-  controllers: [AppController],
-  providers: [AppService, AppRepository, PineconeLoader],
+  controllers: [GameGuideController],
+  providers: [GameGuideService, GameGuideRepository, PineconeLoader],
 })
 export class AppModule {}

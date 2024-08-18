@@ -9,7 +9,7 @@ import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 
 const PATH_TO_DOCUMENTS = `/src/documents`;
 @Injectable()
-export class AppRepository {
+export class GameGuideRepository {
   private readonly hfEmbeddings = new HuggingFaceTransformersEmbeddings({
     model: 'Xenova/all-MiniLM-L6-v2',
   });
